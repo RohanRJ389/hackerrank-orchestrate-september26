@@ -1,0 +1,268 @@
+{
+  "schema_version": "1.0.0",
+  "financial_state": {
+    "schema_version": "1.0.0",
+    "user_id": "user_20",
+    "home_currency": "INR",
+    "as_of_date": "2026-02-07",
+    "forecast_end_date": "2026-05-08",
+    "opening_balance": "102609.05",
+    "minimum_balance_to_keep": "64500",
+    "preferences": {
+      "financial_priorities": [
+        "education",
+        "family_support"
+      ],
+      "protected_categories": [
+        "education",
+        "housing",
+        "utilities"
+      ],
+      "reducible_categories": [
+        "dining",
+        "entertainment"
+      ],
+      "stoppable_categories": [
+        "cloud_storage"
+      ],
+      "accepted_payment_methods": [
+        "full_payment",
+        "partial_payment",
+        "installments"
+      ],
+      "max_installment_months": 11
+    },
+    "cash_flows": [
+      {
+        "occurrence_id": "occ_pending_order",
+        "date": "2026-02-08",
+        "direction": "outflow",
+        "amount": "4470",
+        "category": "shopping",
+        "origin": "reserved_pending_debit",
+        "certainty": "confirmed",
+        "is_protected": false,
+        "description": "Pending online order charge",
+        "adjustable_series_id": null,
+        "source_event_id": "event_1787",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_1787",
+            "detail": null
+          }
+        ]
+      },
+      {
+        "occurrence_id": "occ_pending_telecom",
+        "date": "2026-02-09",
+        "direction": "outflow",
+        "amount": "704.05",
+        "category": "utilities",
+        "origin": "reserved_pending_debit",
+        "certainty": "confirmed",
+        "is_protected": true,
+        "description": "Outstanding telecom bill from the statement",
+        "adjustable_series_id": null,
+        "source_event_id": "event_1786",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_1786",
+            "detail": null
+          },
+          {
+            "kind": "image",
+            "ref_id": "image_05",
+            "detail": "amount due 704.05"
+          }
+        ]
+      },
+      {
+        "occurrence_id": "occ_pending_refund",
+        "date": "2026-02-14",
+        "direction": "inflow",
+        "amount": "8640",
+        "category": "shopping",
+        "origin": "confirmed_income",
+        "certainty": "confirmed",
+        "is_protected": false,
+        "description": "Merchant refund that has not settled",
+        "adjustable_series_id": null,
+        "source_event_id": "event_1785",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_1785",
+            "detail": null
+          },
+          {
+            "kind": "message",
+            "ref_id": "message_14",
+            "detail": null
+          }
+        ]
+      },
+      {
+        "occurrence_id": "occ_salary_2026_02",
+        "date": "2026-02-15",
+        "direction": "inflow",
+        "amount": "108000",
+        "category": "salary",
+        "origin": "recurring_income_forecast",
+        "certainty": "forecast",
+        "is_protected": false,
+        "description": "Payroll credit",
+        "adjustable_series_id": null,
+        "source_event_id": null,
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_1725",
+            "detail": null
+          },
+          {
+            "kind": "financial_event",
+            "ref_id": "event_1733",
+            "detail": null
+          }
+        ]
+      }
+    ],
+    "adjustable_series": [],
+    "evidence_resolutions": [],
+    "excluded_evidence": [
+      {
+        "source": {
+          "kind": "financial_event",
+          "ref_id": "event_1785",
+          "detail": null
+        },
+        "reason": "pending_credit",
+        "explanation": "The merchant refund has been initiated but has not reached the account."
+      }
+    ],
+    "assumptions": [],
+    "attestation": {
+      "model_provider": "anthropic",
+      "model_name": "claude-opus-4-6",
+      "generated_at": "2026-09-13T02:00:00+05:30",
+      "attested": true,
+      "notes": "Contradicts itself: the refund is excluded and also projected."
+    }
+  },
+  "request": {
+    "schema_version": "1.0.0",
+    "request_id": "request_20",
+    "user_id": "user_20",
+    "request_date": "2026-02-07",
+    "request_type": "travel",
+    "requested_amount": "303700",
+    "currency": "INR",
+    "desired_completion_date": "2026-02-22",
+    "allows_partial_payment": false,
+    "request_text": "I can book the family trip for INR 303,700. Would it be safer to book the trip now or wait until more money comes in?",
+    "payment_options": [
+      {
+        "payment_option_id": "payment_option_55",
+        "method": "full_payment",
+        "payment_amount": "303700",
+        "number_of_payments": 1,
+        "first_payment_date": "2026-02-07",
+        "payment_frequency_days": null,
+        "financing_fee": "0",
+        "total_payable_amount": "303700",
+        "schedule": [
+          {
+            "date": "2026-02-07",
+            "amount": "303700"
+          }
+        ]
+      },
+      {
+        "payment_option_id": "payment_option_56",
+        "method": "installments",
+        "payment_amount": "19234.33",
+        "number_of_payments": 18,
+        "first_payment_date": "2026-02-07",
+        "payment_frequency_days": 31,
+        "financing_fee": "42517.94",
+        "total_payable_amount": "346217.94",
+        "schedule": [
+          {
+            "date": "2026-02-07",
+            "amount": "19234.33"
+          },
+          {
+            "date": "2026-03-10",
+            "amount": "19234.33"
+          },
+          {
+            "date": "2026-04-10",
+            "amount": "19234.33"
+          },
+          {
+            "date": "2026-05-11",
+            "amount": "19234.33"
+          },
+          {
+            "date": "2026-06-11",
+            "amount": "19234.33"
+          },
+          {
+            "date": "2026-07-12",
+            "amount": "19234.33"
+          },
+          {
+            "date": "2026-08-12",
+            "amount": "19234.33"
+          },
+          {
+            "date": "2026-09-12",
+            "amount": "19234.33"
+          },
+          {
+            "date": "2026-10-13",
+            "amount": "19234.33"
+          },
+          {
+            "date": "2026-11-13",
+            "amount": "19234.33"
+          },
+          {
+            "date": "2026-12-14",
+            "amount": "19234.33"
+          },
+          {
+            "date": "2027-01-14",
+            "amount": "19234.33"
+          },
+          {
+            "date": "2027-02-14",
+            "amount": "19234.33"
+          },
+          {
+            "date": "2027-03-17",
+            "amount": "19234.33"
+          },
+          {
+            "date": "2027-04-17",
+            "amount": "19234.33"
+          },
+          {
+            "date": "2027-05-18",
+            "amount": "19234.33"
+          },
+          {
+            "date": "2027-06-18",
+            "amount": "19234.33"
+          },
+          {
+            "date": "2027-07-19",
+            "amount": "19234.33"
+          }
+        ]
+      }
+    ]
+  }
+}

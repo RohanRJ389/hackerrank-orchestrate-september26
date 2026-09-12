@@ -1,0 +1,346 @@
+{
+  "schema_version": "1.0.0",
+  "financial_state": {
+    "schema_version": "1.0.0",
+    "user_id": "user_06",
+    "home_currency": "EUR",
+    "as_of_date": "2026-01-03",
+    "forecast_end_date": "2026-04-03",
+    "opening_balance": "1942.4",
+    "minimum_balance_to_keep": "800",
+    "preferences": {
+      "financial_priorities": [
+        "emergency_savings",
+        "travel"
+      ],
+      "protected_categories": [
+        "rent",
+        "insurance",
+        "transport"
+      ],
+      "reducible_categories": [],
+      "stoppable_categories": [
+        "streaming"
+      ],
+      "accepted_payment_methods": [
+        "full_payment",
+        "partial_payment"
+      ],
+      "max_installment_months": null
+    },
+    "cash_flows": [
+      {
+        "occurrence_id": "occ_utilities_2026_01",
+        "date": "2026-01-07",
+        "direction": "outflow",
+        "amount": "58.98",
+        "category": "utilities",
+        "origin": "recurring_expense_forecast",
+        "certainty": "forecast",
+        "description": "Water and power payment",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_465",
+            "detail": null
+          },
+          {
+            "kind": "financial_event",
+            "ref_id": "event_473",
+            "detail": null
+          }
+        ],
+        "is_protected": false,
+        "adjustable_series_id": null,
+        "source_event_id": null
+      },
+      {
+        "occurrence_id": "occ_insurance_2026_01",
+        "date": "2026-01-08",
+        "direction": "outflow",
+        "amount": "26",
+        "category": "insurance",
+        "origin": "recurring_expense_forecast",
+        "certainty": "forecast",
+        "description": "Vehicle insurance premium",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_466",
+            "detail": null
+          },
+          {
+            "kind": "financial_event",
+            "ref_id": "event_474",
+            "detail": null
+          }
+        ],
+        "is_protected": true,
+        "adjustable_series_id": null,
+        "source_event_id": null
+      },
+      {
+        "occurrence_id": "occ_streaming_2026_01",
+        "date": "2026-01-10",
+        "direction": "outflow",
+        "amount": "19",
+        "category": "streaming",
+        "origin": "recurring_expense_forecast",
+        "certainty": "forecast",
+        "description": "Family streaming plan",
+        "adjustable_series_id": "series_streaming",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_468",
+            "detail": null
+          },
+          {
+            "kind": "financial_event",
+            "ref_id": "event_476",
+            "detail": null
+          }
+        ],
+        "is_protected": false,
+        "source_event_id": null
+      },
+      {
+        "occurrence_id": "occ_salary_2026_01",
+        "date": "2026-01-15",
+        "direction": "inflow",
+        "amount": "1037.52",
+        "category": "salary",
+        "origin": "confirmed_income",
+        "certainty": "confirmed",
+        "description": "Reduced payroll credit",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_471",
+            "detail": null
+          },
+          {
+            "kind": "message",
+            "ref_id": "message_04",
+            "detail": null
+          }
+        ],
+        "is_protected": false,
+        "adjustable_series_id": null,
+        "source_event_id": null
+      },
+      {
+        "occurrence_id": "occ_rent_2026_02",
+        "date": "2026-02-03",
+        "direction": "outflow",
+        "amount": "254.10",
+        "category": "rent",
+        "origin": "recurring_expense_forecast",
+        "certainty": "forecast",
+        "description": "Monthly rent",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_464",
+            "detail": null
+          },
+          {
+            "kind": "financial_event",
+            "ref_id": "event_472",
+            "detail": null
+          }
+        ],
+        "is_protected": true,
+        "adjustable_series_id": null,
+        "source_event_id": null
+      },
+      {
+        "occurrence_id": "occ_streaming_2026_02",
+        "date": "2026-02-10",
+        "direction": "outflow",
+        "amount": "19",
+        "category": "streaming",
+        "origin": "recurring_expense_forecast",
+        "certainty": "forecast",
+        "description": "Family streaming plan",
+        "adjustable_series_id": "series_streaming",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_468",
+            "detail": null
+          },
+          {
+            "kind": "financial_event",
+            "ref_id": "event_476",
+            "detail": null
+          }
+        ],
+        "is_protected": false,
+        "source_event_id": null
+      },
+      {
+        "occurrence_id": "occ_salary_2026_02",
+        "date": "2026-02-15",
+        "direction": "inflow",
+        "amount": "1037.52",
+        "category": "salary",
+        "origin": "recurring_income_forecast",
+        "certainty": "forecast",
+        "description": "Reduced payroll credit",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_471",
+            "detail": null
+          },
+          {
+            "kind": "message",
+            "ref_id": "message_04",
+            "detail": null
+          }
+        ],
+        "is_protected": false,
+        "adjustable_series_id": null,
+        "source_event_id": null
+      }
+    ],
+    "adjustable_series": [
+      {
+        "series_id": "series_streaming",
+        "target_event_id": "event_476",
+        "category": "streaming",
+        "action": "stop",
+        "current_amount": "19",
+        "minimum_allowed_amount": null,
+        "occurrence_ids": [
+          "occ_streaming_2026_01",
+          "occ_streaming_2026_02"
+        ],
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_468",
+            "detail": null
+          },
+          {
+            "kind": "financial_event",
+            "ref_id": "event_476",
+            "detail": null
+          }
+        ]
+      }
+    ],
+    "evidence_resolutions": [
+      {
+        "resolution_id": "res_reduced_pay",
+        "summary": "Payroll confirms temporary monthly pay of EUR 1,037.52 continues into the next cycle.",
+        "basis": "newer_record_same_source",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_471",
+            "detail": null
+          },
+          {
+            "kind": "message",
+            "ref_id": "message_04",
+            "detail": null
+          }
+        ],
+        "affected_occurrence_ids": [
+          "occ_salary_2026_01",
+          "occ_salary_2026_02"
+        ],
+        "is_conservative_fallback": false
+      }
+    ],
+    "excluded_evidence": [
+      {
+        "source": {
+          "kind": "financial_event",
+          "ref_id": "event_557",
+          "detail": null
+        },
+        "reason": "cancelled",
+        "explanation": "Cancelled card authorization never debited the account."
+      }
+    ],
+    "assumptions": [
+      "Only the streaming plan may be stopped; rent, insurance and transport are protected."
+    ],
+    "attestation": {
+      "model_provider": "anthropic",
+      "model_name": "claude-opus-4-6",
+      "generated_at": "2026-09-13T02:00:00+05:30",
+      "attested": true,
+      "notes": null
+    }
+  },
+  "request": {
+    "schema_version": "1.0.0",
+    "request_id": "request_06",
+    "user_id": "user_06",
+    "request_date": "2026-01-03",
+    "request_type": "investment",
+    "requested_amount": "620.4",
+    "currency": "EUR",
+    "desired_completion_date": "2026-01-14",
+    "allows_partial_payment": false,
+    "request_text": "I want to put EUR 620.40 into an investment. I need to complete it by 14 January 2026. Is it safer to invest now, invest a smaller amount, or wait?",
+    "payment_options": [
+      {
+        "payment_option_id": "payment_option_16",
+        "method": "full_payment",
+        "payment_amount": "620.4",
+        "number_of_payments": 1,
+        "first_payment_date": "2026-01-03",
+        "payment_frequency_days": null,
+        "financing_fee": "0",
+        "total_payable_amount": "620.4",
+        "schedule": [
+          {
+            "date": "2026-01-03",
+            "amount": "620.4"
+          }
+        ]
+      },
+      {
+        "payment_option_id": "payment_option_18",
+        "method": "installments",
+        "payment_amount": "111.67",
+        "number_of_payments": 6,
+        "first_payment_date": "2026-01-17",
+        "payment_frequency_days": 30,
+        "financing_fee": "49.62",
+        "total_payable_amount": "670.02",
+        "schedule": [
+          {
+            "date": "2026-01-17",
+            "amount": "111.67"
+          },
+          {
+            "date": "2026-02-16",
+            "amount": "111.67"
+          },
+          {
+            "date": "2026-03-18",
+            "amount": "111.67"
+          },
+          {
+            "date": "2026-04-17",
+            "amount": "111.67"
+          },
+          {
+            "date": "2026-05-17",
+            "amount": "111.67"
+          },
+          {
+            "date": "2026-06-16",
+            "amount": "111.67"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,268 @@
+{
+  "schema_version": "1.0.0",
+  "financial_state": {
+    "schema_version": "1.0.0",
+    "user_id": "user_25",
+    "home_currency": "IDR",
+    "as_of_date": "2024-03-06",
+    "forecast_end_date": "2024-06-04",
+    "opening_balance": "32063050",
+    "minimum_balance_to_keep": "23379100",
+    "preferences": {
+      "financial_priorities": [
+        "emergency_savings",
+        "travel"
+      ],
+      "protected_categories": [
+        "rent",
+        "insurance",
+        "transport"
+      ],
+      "reducible_categories": [],
+      "stoppable_categories": [],
+      "accepted_payment_methods": [
+        "full_payment",
+        "installments"
+      ],
+      "max_installment_months": 3
+    },
+    "cash_flows": [
+      {
+        "occurrence_id": "occ_salary_2024_03",
+        "date": "2024-03-15",
+        "direction": "inflow",
+        "amount": "28499994.00",
+        "category": "salary",
+        "origin": "confirmed_income",
+        "certainty": "confirmed",
+        "description": "International employer payroll converted to IDR",
+        "source_event_id": "event_2288",
+        "original_currency": "USD",
+        "original_amount": "1800",
+        "exchange_rate_date": "2024-03-15",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_2288",
+            "detail": null
+          },
+          {
+            "kind": "exchange_rate",
+            "ref_id": "2024-03-15:USD:IDR",
+            "detail": "rate 15833.33"
+          }
+        ],
+        "is_protected": false,
+        "adjustable_series_id": null
+      },
+      {
+        "occurrence_id": "occ_rent_2024_04",
+        "date": "2024-04-02",
+        "direction": "outflow",
+        "amount": "6954000",
+        "category": "rent",
+        "origin": "recurring_expense_forecast",
+        "certainty": "forecast",
+        "description": "Monthly rent",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_2200",
+            "detail": null
+          },
+          {
+            "kind": "financial_event",
+            "ref_id": "event_2207",
+            "detail": null
+          }
+        ],
+        "is_protected": true,
+        "adjustable_series_id": null,
+        "source_event_id": null
+      },
+      {
+        "occurrence_id": "occ_salary_2024_04",
+        "date": "2024-04-15",
+        "direction": "inflow",
+        "amount": "28499994.00",
+        "category": "salary",
+        "origin": "recurring_income_forecast",
+        "certainty": "forecast",
+        "description": "International employer payroll converted to IDR",
+        "original_currency": "USD",
+        "original_amount": "1800",
+        "exchange_rate_date": "2024-04-15",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_2199",
+            "detail": null
+          },
+          {
+            "kind": "financial_event",
+            "ref_id": "event_2288",
+            "detail": null
+          },
+          {
+            "kind": "exchange_rate",
+            "ref_id": "2024-04-15:USD:IDR",
+            "detail": "rate 15833.33"
+          }
+        ],
+        "is_protected": false,
+        "adjustable_series_id": null,
+        "source_event_id": null
+      },
+      {
+        "occurrence_id": "occ_rent_2024_05",
+        "date": "2024-05-02",
+        "direction": "outflow",
+        "amount": "6954000",
+        "category": "rent",
+        "origin": "recurring_expense_forecast",
+        "certainty": "forecast",
+        "description": "Monthly rent",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_2200",
+            "detail": null
+          },
+          {
+            "kind": "financial_event",
+            "ref_id": "event_2207",
+            "detail": null
+          }
+        ],
+        "is_protected": true,
+        "adjustable_series_id": null,
+        "source_event_id": null
+      }
+    ],
+    "adjustable_series": [],
+    "evidence_resolutions": [],
+    "excluded_evidence": [
+      {
+        "source": {
+          "kind": "financial_event",
+          "ref_id": "event_2287",
+          "detail": null
+        },
+        "reason": "failed_no_retry",
+        "explanation": "Subscription debit failed and no evidence shows it being retried."
+      }
+    ],
+    "assumptions": [
+      "USD payroll is converted at the settlement-date rate of 15833.33 IDR per USD."
+    ],
+    "attestation": {
+      "model_provider": "anthropic",
+      "model_name": "claude-opus-4-6",
+      "generated_at": "2026-09-13T02:00:00+05:30",
+      "attested": true,
+      "notes": null
+    }
+  },
+  "request": {
+    "schema_version": "1.0.0",
+    "request_id": "request_25",
+    "user_id": "user_25",
+    "request_date": "2024-03-06",
+    "request_type": "housing",
+    "requested_amount": "60496000",
+    "currency": "IDR",
+    "desired_completion_date": "2024-04-17",
+    "allows_partial_payment": true,
+    "request_text": "Is the deposit affordable now, or do I need more time? I need IDR 60,496,000 for the rental deposit.",
+    "payment_options": [
+      {
+        "payment_option_id": "payment_option_69",
+        "method": "full_payment",
+        "payment_amount": "60496000",
+        "number_of_payments": 1,
+        "first_payment_date": "2024-03-06",
+        "payment_frequency_days": null,
+        "financing_fee": "0",
+        "total_payable_amount": "60496000",
+        "schedule": [
+          {
+            "date": "2024-03-06",
+            "amount": "60496000"
+          }
+        ]
+      },
+      {
+        "payment_option_id": "payment_option_70",
+        "method": "installments",
+        "payment_amount": "4436373.33",
+        "number_of_payments": 15,
+        "first_payment_date": "2024-03-09",
+        "payment_frequency_days": 30,
+        "financing_fee": "6049599.95",
+        "total_payable_amount": "66545599.95",
+        "schedule": [
+          {
+            "date": "2024-03-09",
+            "amount": "4436373.33"
+          },
+          {
+            "date": "2024-04-08",
+            "amount": "4436373.33"
+          },
+          {
+            "date": "2024-05-08",
+            "amount": "4436373.33"
+          },
+          {
+            "date": "2024-06-07",
+            "amount": "4436373.33"
+          },
+          {
+            "date": "2024-07-07",
+            "amount": "4436373.33"
+          },
+          {
+            "date": "2024-08-06",
+            "amount": "4436373.33"
+          },
+          {
+            "date": "2024-09-05",
+            "amount": "4436373.33"
+          },
+          {
+            "date": "2024-10-05",
+            "amount": "4436373.33"
+          },
+          {
+            "date": "2024-11-04",
+            "amount": "4436373.33"
+          },
+          {
+            "date": "2024-12-04",
+            "amount": "4436373.33"
+          },
+          {
+            "date": "2025-01-03",
+            "amount": "4436373.33"
+          },
+          {
+            "date": "2025-02-02",
+            "amount": "4436373.33"
+          },
+          {
+            "date": "2025-03-04",
+            "amount": "4436373.33"
+          },
+          {
+            "date": "2025-04-03",
+            "amount": "4436373.33"
+          },
+          {
+            "date": "2025-05-03",
+            "amount": "4436373.33"
+          }
+        ]
+      }
+    ]
+  }
+}

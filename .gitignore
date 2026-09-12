@@ -1,3 +1,50 @@
 .gh/
-log.txt
 .env
+.env.*
+!.env.example
+
+# Agent session log (do not commit)
+log.txt
+
+# Bytecode / caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+.cache/
+
+# Virtualenvs and packaging
+.venv/
+venv/
+ENV/
+env/
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+pip-wheel-metadata/
+wheels/
+*.whl
+
+# Tools / notebooks
+.ipynb_checkpoints/
+.python-version
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*~

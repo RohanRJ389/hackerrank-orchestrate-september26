@@ -1,0 +1,222 @@
+{
+  "schema_version": "1.0.0",
+  "financial_state": {
+    "schema_version": "1.0.0",
+    "user_id": "user_02",
+    "home_currency": "IDR",
+    "as_of_date": "2025-08-05",
+    "forecast_end_date": "2025-11-03",
+    "opening_balance": "60383889.2",
+    "minimum_balance_to_keep": "29158400",
+    "preferences": {
+      "financial_priorities": [
+        "education",
+        "family_support"
+      ],
+      "protected_categories": [
+        "housing",
+        "utilities",
+        "education"
+      ],
+      "reducible_categories": [
+        "entertainment"
+      ],
+      "stoppable_categories": [
+        "cloud_storage"
+      ],
+      "accepted_payment_methods": [
+        "partial_payment",
+        "installments"
+      ],
+      "max_installment_months": 7
+    },
+    "cash_flows": [
+      {
+        "occurrence_id": "occ_pending_merchant",
+        "date": "2025-08-08",
+        "direction": "outflow",
+        "amount": "1651100",
+        "category": "shopping",
+        "origin": "reserved_pending_debit",
+        "certainty": "confirmed",
+        "description": "Pending merchant debit",
+        "source_event_id": "event_185",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_185",
+            "detail": null
+          }
+        ],
+        "is_protected": false,
+        "adjustable_series_id": null
+      },
+      {
+        "occurrence_id": "occ_salary_2025_08",
+        "date": "2025-08-15",
+        "direction": "inflow",
+        "amount": "42750000",
+        "category": "salary",
+        "origin": "confirmed_income",
+        "certainty": "confirmed",
+        "description": "Payroll credit at the revised salary",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_136",
+            "detail": null
+          },
+          {
+            "kind": "message",
+            "ref_id": "message_01",
+            "detail": null
+          }
+        ],
+        "is_protected": false,
+        "adjustable_series_id": null,
+        "source_event_id": null
+      },
+      {
+        "occurrence_id": "occ_salary_2025_09",
+        "date": "2025-09-15",
+        "direction": "inflow",
+        "amount": "42750000",
+        "category": "salary",
+        "origin": "recurring_income_forecast",
+        "certainty": "forecast",
+        "description": "Payroll credit at the revised salary",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_136",
+            "detail": null
+          },
+          {
+            "kind": "message",
+            "ref_id": "message_01",
+            "detail": null
+          }
+        ],
+        "is_protected": false,
+        "adjustable_series_id": null,
+        "source_event_id": null
+      },
+      {
+        "occurrence_id": "occ_salary_2025_10",
+        "date": "2025-10-15",
+        "direction": "inflow",
+        "amount": "42750000",
+        "category": "salary",
+        "origin": "recurring_income_forecast",
+        "certainty": "forecast",
+        "description": "Payroll credit at the revised salary",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_136",
+            "detail": null
+          },
+          {
+            "kind": "message",
+            "ref_id": "message_01",
+            "detail": null
+          }
+        ],
+        "is_protected": false,
+        "adjustable_series_id": null,
+        "source_event_id": null
+      }
+    ],
+    "adjustable_series": [],
+    "evidence_resolutions": [
+      {
+        "resolution_id": "res_salary_increase",
+        "summary": "Employer message raises monthly pay to IDR 42,750,000 from 2025-08-15, superseding the IDR 33,345,000 history.",
+        "basis": "newer_record_same_source",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_136",
+            "detail": null
+          },
+          {
+            "kind": "message",
+            "ref_id": "message_01",
+            "detail": null
+          }
+        ],
+        "affected_occurrence_ids": [
+          "occ_salary_2025_08",
+          "occ_salary_2025_09",
+          "occ_salary_2025_10"
+        ],
+        "is_conservative_fallback": false
+      }
+    ],
+    "excluded_evidence": [],
+    "assumptions": [
+      "The salary increase is dated and confirmed, so it is counted from 2025-08-15."
+    ],
+    "attestation": {
+      "model_provider": "anthropic",
+      "model_name": "claude-opus-4-6",
+      "generated_at": "2026-09-13T02:00:00+05:30",
+      "attested": true,
+      "notes": null
+    }
+  },
+  "request": {
+    "schema_version": "1.0.0",
+    "request_id": "request_02",
+    "user_id": "user_02",
+    "request_date": "2025-08-05",
+    "request_type": "travel",
+    "requested_amount": "46018000",
+    "currency": "IDR",
+    "desired_completion_date": "2025-10-10",
+    "allows_partial_payment": false,
+    "request_text": "The current quote for the trip is IDR 46,018,000. I need to complete it by 10 October 2025. Can I afford the full trip without putting upcoming bills at risk?",
+    "payment_options": [
+      {
+        "payment_option_id": "payment_option_05",
+        "method": "installments",
+        "payment_amount": "15952906.67",
+        "number_of_payments": 3,
+        "first_payment_date": "2025-08-08",
+        "payment_frequency_days": 30,
+        "financing_fee": "1840720.01",
+        "total_payable_amount": "47858720.01",
+        "schedule": [
+          {
+            "date": "2025-08-08",
+            "amount": "15952906.67"
+          },
+          {
+            "date": "2025-09-07",
+            "amount": "15952906.67"
+          },
+          {
+            "date": "2025-10-07",
+            "amount": "15952906.67"
+          }
+        ]
+      },
+      {
+        "payment_option_id": "payment_option_06",
+        "method": "full_payment",
+        "payment_amount": "46018000",
+        "number_of_payments": 1,
+        "first_payment_date": "2025-08-05",
+        "payment_frequency_days": null,
+        "financing_fee": "0",
+        "total_payable_amount": "46018000",
+        "schedule": [
+          {
+            "date": "2025-08-05",
+            "amount": "46018000"
+          }
+        ]
+      }
+    ]
+  }
+}

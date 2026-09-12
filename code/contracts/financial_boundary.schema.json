@@ -1,0 +1,850 @@
+{
+  "$defs": {
+    "AdjustableSeries": {
+      "additionalProperties": false,
+      "description": "A flexible recurring expense the engine may stop or reduce.\n\n`target_event_id` is what a `spending_changes_needed` action must cite, so\nit has to be a real event the user can act on.",
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/AdjustmentAction"
+        },
+        "category": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Category",
+          "type": "string"
+        },
+        "current_amount": {
+          "title": "Current Amount",
+          "type": "string"
+        },
+        "minimum_allowed_amount": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Minimum Allowed Amount"
+        },
+        "occurrence_ids": {
+          "items": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^\\S+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Occurrence Ids",
+          "type": "array"
+        },
+        "series_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "title": "Series Id",
+          "type": "string"
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/$defs/SourceRef"
+          },
+          "minItems": 1,
+          "title": "Sources",
+          "type": "array"
+        },
+        "target_event_id": {
+          "pattern": "^event_\\d+$",
+          "title": "Target Event Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "series_id",
+        "target_event_id",
+        "category",
+        "action",
+        "current_amount",
+        "occurrence_ids",
+        "sources"
+      ],
+      "title": "AdjustableSeries",
+      "type": "object"
+    },
+    "AdjustmentAction": {
+      "enum": [
+        "stop",
+        "reduce",
+        "stop_or_reduce"
+      ],
+      "title": "AdjustmentAction",
+      "type": "string"
+    },
+    "CashFlowOccurrence": {
+      "additionalProperties": false,
+      "description": "One dated cash movement on the forward timeline, in home currency.",
+      "properties": {
+        "adjustable_series_id": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "minLength": 1,
+              "pattern": "^\\S+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Adjustable Series Id"
+        },
+        "amount": {
+          "title": "Amount",
+          "type": "string"
+        },
+        "category": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Category",
+          "type": "string"
+        },
+        "certainty": {
+          "$ref": "#/$defs/Certainty"
+        },
+        "date": {
+          "format": "date",
+          "title": "Date",
+          "type": "string"
+        },
+        "description": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "direction": {
+          "$ref": "#/$defs/Direction"
+        },
+        "exchange_rate_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Exchange Rate Date"
+        },
+        "is_protected": {
+          "title": "Is Protected",
+          "type": "boolean"
+        },
+        "occurrence_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "title": "Occurrence Id",
+          "type": "string"
+        },
+        "origin": {
+          "$ref": "#/$defs/CashFlowOrigin"
+        },
+        "original_amount": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Original Amount"
+        },
+        "original_currency": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Currency"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "source_event_id": {
+          "anyOf": [
+            {
+              "pattern": "^event_\\d+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Event Id"
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/$defs/SourceRef"
+          },
+          "minItems": 1,
+          "title": "Sources",
+          "type": "array"
+        }
+      },
+      "required": [
+        "occurrence_id",
+        "date",
+        "direction",
+        "amount",
+        "category",
+        "origin",
+        "certainty",
+        "is_protected",
+        "description",
+        "sources"
+      ],
+      "title": "CashFlowOccurrence",
+      "type": "object"
+    },
+    "CashFlowOrigin": {
+      "description": "Why a dated cash movement belongs on the forward timeline.\n\nThe enum deliberately has no member for pending credits, unrealized\nvaluations, cancelled records, or failed debits with no retry: those can\nnever become projected cash and must be reported as excluded evidence.",
+      "enum": [
+        "confirmed_income",
+        "recurring_income_forecast",
+        "reserved_pending_debit",
+        "scheduled_debit",
+        "recurring_expense_forecast",
+        "variable_essential_forecast",
+        "committed_one_time_debit"
+      ],
+      "title": "CashFlowOrigin",
+      "type": "string"
+    },
+    "Certainty": {
+      "description": "How firm the dated amount is.\n\n`CONFIRMED` covers settled, scheduled, and explicitly confirmed records.\n`FORECAST` covers amounts the normalizer projected from history.",
+      "enum": [
+        "confirmed",
+        "forecast"
+      ],
+      "title": "Certainty",
+      "type": "string"
+    },
+    "Currency": {
+      "enum": [
+        "INR",
+        "ZAR",
+        "IDR",
+        "USD",
+        "EUR"
+      ],
+      "title": "Currency",
+      "type": "string"
+    },
+    "Direction": {
+      "enum": [
+        "inflow",
+        "outflow"
+      ],
+      "title": "Direction",
+      "type": "string"
+    },
+    "EnrichedRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "allows_partial_payment": {
+          "title": "Allows Partial Payment",
+          "type": "boolean"
+        },
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        },
+        "desired_completion_date": {
+          "format": "date",
+          "title": "Desired Completion Date",
+          "type": "string"
+        },
+        "payment_options": {
+          "items": {
+            "$ref": "#/$defs/PaymentOption"
+          },
+          "maxItems": 4,
+          "minItems": 2,
+          "title": "Payment Options",
+          "type": "array"
+        },
+        "request_date": {
+          "format": "date",
+          "title": "Request Date",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^request_\\d+$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "request_text": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Request Text",
+          "type": "string"
+        },
+        "request_type": {
+          "$ref": "#/$defs/RequestType"
+        },
+        "requested_amount": {
+          "title": "Requested Amount",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "user_id": {
+          "pattern": "^user_\\d+$",
+          "title": "User Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "request_id",
+        "user_id",
+        "request_date",
+        "request_type",
+        "requested_amount",
+        "currency",
+        "desired_completion_date",
+        "allows_partial_payment",
+        "request_text",
+        "payment_options"
+      ],
+      "title": "EnrichedRequest",
+      "type": "object"
+    },
+    "EvidenceKind": {
+      "enum": [
+        "financial_event",
+        "message",
+        "image",
+        "profile",
+        "request",
+        "payment_option",
+        "exchange_rate"
+      ],
+      "title": "EvidenceKind",
+      "type": "string"
+    },
+    "EvidenceResolution": {
+      "additionalProperties": false,
+      "description": "An auditable record of how the normalizer settled ambiguous evidence.",
+      "properties": {
+        "affected_occurrence_ids": {
+          "default": [],
+          "items": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^\\S+$",
+            "type": "string"
+          },
+          "title": "Affected Occurrence Ids",
+          "type": "array"
+        },
+        "basis": {
+          "$ref": "#/$defs/ResolutionBasis"
+        },
+        "is_conservative_fallback": {
+          "default": false,
+          "title": "Is Conservative Fallback",
+          "type": "boolean"
+        },
+        "resolution_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "title": "Resolution Id",
+          "type": "string"
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/$defs/SourceRef"
+          },
+          "minItems": 1,
+          "title": "Sources",
+          "type": "array"
+        },
+        "summary": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Summary",
+          "type": "string"
+        }
+      },
+      "required": [
+        "resolution_id",
+        "summary",
+        "basis",
+        "sources"
+      ],
+      "title": "EvidenceResolution",
+      "type": "object"
+    },
+    "ExcludedEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "explanation": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Explanation",
+          "type": "string"
+        },
+        "reason": {
+          "$ref": "#/$defs/ExclusionReason"
+        },
+        "source": {
+          "$ref": "#/$defs/SourceRef"
+        }
+      },
+      "required": [
+        "source",
+        "reason",
+        "explanation"
+      ],
+      "title": "ExcludedEvidence",
+      "type": "object"
+    },
+    "ExclusionReason": {
+      "enum": [
+        "pending_credit",
+        "unrealized_valuation",
+        "cancelled",
+        "failed_no_retry",
+        "duplicate_record",
+        "internal_transfer",
+        "superseded_by_amendment",
+        "unconfirmed_income",
+        "outside_forecast_window",
+        "not_relevant",
+        "untrusted_instruction"
+      ],
+      "title": "ExclusionReason",
+      "type": "string"
+    },
+    "FinancialState": {
+      "additionalProperties": false,
+      "properties": {
+        "adjustable_series": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/AdjustableSeries"
+          },
+          "title": "Adjustable Series",
+          "type": "array"
+        },
+        "as_of_date": {
+          "format": "date",
+          "title": "As Of Date",
+          "type": "string"
+        },
+        "assumptions": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Assumptions",
+          "type": "array"
+        },
+        "attestation": {
+          "$ref": "#/$defs/ModelAttestation"
+        },
+        "cash_flows": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/CashFlowOccurrence"
+          },
+          "title": "Cash Flows",
+          "type": "array"
+        },
+        "evidence_resolutions": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/EvidenceResolution"
+          },
+          "title": "Evidence Resolutions",
+          "type": "array"
+        },
+        "excluded_evidence": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ExcludedEvidence"
+          },
+          "title": "Excluded Evidence",
+          "type": "array"
+        },
+        "forecast_end_date": {
+          "format": "date",
+          "title": "Forecast End Date",
+          "type": "string"
+        },
+        "home_currency": {
+          "$ref": "#/$defs/Currency"
+        },
+        "minimum_balance_to_keep": {
+          "title": "Minimum Balance To Keep",
+          "type": "string"
+        },
+        "opening_balance": {
+          "title": "Opening Balance",
+          "type": "string"
+        },
+        "preferences": {
+          "$ref": "#/$defs/ProfilePreferences"
+        },
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "user_id": {
+          "pattern": "^user_\\d+$",
+          "title": "User Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "user_id",
+        "home_currency",
+        "as_of_date",
+        "forecast_end_date",
+        "opening_balance",
+        "minimum_balance_to_keep",
+        "preferences",
+        "attestation"
+      ],
+      "title": "FinancialState",
+      "type": "object"
+    },
+    "ModelAttestation": {
+      "additionalProperties": false,
+      "description": "The normalizer's sign-off on the financial state it produced.",
+      "properties": {
+        "attested": {
+          "const": true,
+          "title": "Attested",
+          "type": "boolean"
+        },
+        "generated_at": {
+          "format": "date-time",
+          "title": "Generated At",
+          "type": "string"
+        },
+        "model_name": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Model Name",
+          "type": "string"
+        },
+        "model_provider": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Model Provider",
+          "type": "string"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "maxLength": 1000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        }
+      },
+      "required": [
+        "model_provider",
+        "model_name",
+        "generated_at",
+        "attested"
+      ],
+      "title": "ModelAttestation",
+      "type": "object"
+    },
+    "OfferedPaymentMethod": {
+      "description": "Methods that appear in `request_payment_options.csv`.",
+      "enum": [
+        "full_payment",
+        "installments"
+      ],
+      "title": "OfferedPaymentMethod",
+      "type": "string"
+    },
+    "PaymentMethod": {
+      "description": "Payment methods a user may accept and a seller may offer.",
+      "enum": [
+        "full_payment",
+        "partial_payment",
+        "installments"
+      ],
+      "title": "PaymentMethod",
+      "type": "string"
+    },
+    "PaymentOption": {
+      "additionalProperties": false,
+      "description": "A seller offer, expanded into the exact dates the buyer would pay.",
+      "properties": {
+        "financing_fee": {
+          "title": "Financing Fee",
+          "type": "string"
+        },
+        "first_payment_date": {
+          "format": "date",
+          "title": "First Payment Date",
+          "type": "string"
+        },
+        "method": {
+          "$ref": "#/$defs/OfferedPaymentMethod"
+        },
+        "number_of_payments": {
+          "maximum": 60,
+          "minimum": 1,
+          "title": "Number Of Payments",
+          "type": "integer"
+        },
+        "payment_amount": {
+          "title": "Payment Amount",
+          "type": "string"
+        },
+        "payment_frequency_days": {
+          "anyOf": [
+            {
+              "maximum": 366,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Payment Frequency Days"
+        },
+        "payment_option_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "title": "Payment Option Id",
+          "type": "string"
+        },
+        "schedule": {
+          "items": {
+            "$ref": "#/$defs/PaymentScheduleEntry"
+          },
+          "minItems": 1,
+          "title": "Schedule",
+          "type": "array"
+        },
+        "total_payable_amount": {
+          "title": "Total Payable Amount",
+          "type": "string"
+        }
+      },
+      "required": [
+        "payment_option_id",
+        "method",
+        "payment_amount",
+        "number_of_payments",
+        "first_payment_date",
+        "financing_fee",
+        "total_payable_amount",
+        "schedule"
+      ],
+      "title": "PaymentOption",
+      "type": "object"
+    },
+    "PaymentScheduleEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "title": "Amount",
+          "type": "string"
+        },
+        "date": {
+          "format": "date",
+          "title": "Date",
+          "type": "string"
+        }
+      },
+      "required": [
+        "date",
+        "amount"
+      ],
+      "title": "PaymentScheduleEntry",
+      "type": "object"
+    },
+    "ProfilePreferences": {
+      "additionalProperties": false,
+      "properties": {
+        "accepted_payment_methods": {
+          "items": {
+            "$ref": "#/$defs/PaymentMethod"
+          },
+          "title": "Accepted Payment Methods",
+          "type": "array",
+          "uniqueItems": true
+        },
+        "financial_priorities": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Financial Priorities",
+          "type": "array"
+        },
+        "max_installment_months": {
+          "anyOf": [
+            {
+              "maximum": 60,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Installment Months"
+        },
+        "protected_categories": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Protected Categories",
+          "type": "array",
+          "uniqueItems": true
+        },
+        "reducible_categories": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Reducible Categories",
+          "type": "array",
+          "uniqueItems": true
+        },
+        "stoppable_categories": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Stoppable Categories",
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "accepted_payment_methods"
+      ],
+      "title": "ProfilePreferences",
+      "type": "object"
+    },
+    "RequestType": {
+      "enum": [
+        "purchase",
+        "travel",
+        "education",
+        "family_transfer",
+        "debt_repayment",
+        "investment",
+        "housing",
+        "emergency_expense",
+        "other"
+      ],
+      "title": "RequestType",
+      "type": "string"
+    },
+    "ResolutionBasis": {
+      "description": "Conflict-resolution precedence, highest priority first.",
+      "enum": [
+        "explicit_amendment",
+        "newer_record_same_source",
+        "settled_over_estimate",
+        "safer_interpretation"
+      ],
+      "title": "ResolutionBasis",
+      "type": "string"
+    },
+    "SourceRef": {
+      "additionalProperties": false,
+      "description": "Pointer to the dataset row or artifact that supports a derived fact.",
+      "properties": {
+        "detail": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Detail"
+        },
+        "kind": {
+          "$ref": "#/$defs/EvidenceKind"
+        },
+        "ref_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "title": "Ref Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "ref_id"
+      ],
+      "title": "SourceRef",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The complete, self-contained input to the deterministic decision engine.",
+  "properties": {
+    "financial_state": {
+      "$ref": "#/$defs/FinancialState"
+    },
+    "request": {
+      "$ref": "#/$defs/EnrichedRequest"
+    },
+    "schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "financial_state",
+    "request"
+  ],
+  "title": "DecisionInput",
+  "type": "object"
+}

@@ -1,0 +1,325 @@
+{
+  "schema_version": "1.0.0",
+  "financial_state": {
+    "schema_version": "1.0.0",
+    "user_id": "user_01",
+    "home_currency": "ZAR",
+    "as_of_date": "2024-03-03",
+    "forecast_end_date": "2024-06-01",
+    "opening_balance": "58481.1",
+    "minimum_balance_to_keep": "18000",
+    "preferences": {
+      "financial_priorities": [
+        "education",
+        "debt_repayment"
+      ],
+      "protected_categories": [
+        "rent",
+        "education",
+        "groceries",
+        "debt_repayment"
+      ],
+      "reducible_categories": [
+        "dining"
+      ],
+      "stoppable_categories": [
+        "delivery_membership"
+      ],
+      "accepted_payment_methods": [
+        "full_payment"
+      ],
+      "max_installment_months": null
+    },
+    "cash_flows": [
+      {
+        "occurrence_id": "occ_pending_fuel",
+        "date": "2024-03-05",
+        "direction": "outflow",
+        "amount": "567.60",
+        "category": "transport",
+        "origin": "reserved_pending_debit",
+        "certainty": "confirmed",
+        "description": "Pending fuel authorization",
+        "source_event_id": "event_102",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_102",
+            "detail": null
+          }
+        ],
+        "is_protected": false,
+        "adjustable_series_id": null
+      },
+      {
+        "occurrence_id": "occ_delivery_2024_03",
+        "date": "2024-03-13",
+        "direction": "outflow",
+        "amount": "306.90",
+        "category": "delivery_membership",
+        "origin": "recurring_expense_forecast",
+        "certainty": "forecast",
+        "description": "Delivery service plan",
+        "adjustable_series_id": "series_delivery",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_24",
+            "detail": null
+          },
+          {
+            "kind": "financial_event",
+            "ref_id": "event_31",
+            "detail": null
+          }
+        ],
+        "is_protected": false,
+        "source_event_id": null
+      },
+      {
+        "occurrence_id": "occ_salary_2024_03",
+        "date": "2024-03-15",
+        "direction": "inflow",
+        "amount": "23320",
+        "category": "salary",
+        "origin": "confirmed_income",
+        "certainty": "confirmed",
+        "description": "Next confirmed salary",
+        "source_event_id": "event_103",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_103",
+            "detail": null
+          }
+        ],
+        "is_protected": false,
+        "adjustable_series_id": null
+      },
+      {
+        "occurrence_id": "occ_rent_2024_04",
+        "date": "2024-04-02",
+        "direction": "outflow",
+        "amount": "5148",
+        "category": "rent",
+        "origin": "recurring_expense_forecast",
+        "certainty": "forecast",
+        "description": "Apartment rent transfer",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_19",
+            "detail": null
+          },
+          {
+            "kind": "financial_event",
+            "ref_id": "event_26",
+            "detail": null
+          },
+          {
+            "kind": "financial_event",
+            "ref_id": "event_32",
+            "detail": null
+          }
+        ],
+        "is_protected": true,
+        "adjustable_series_id": null,
+        "source_event_id": null
+      },
+      {
+        "occurrence_id": "occ_delivery_2024_04",
+        "date": "2024-04-13",
+        "direction": "outflow",
+        "amount": "306.90",
+        "category": "delivery_membership",
+        "origin": "recurring_expense_forecast",
+        "certainty": "forecast",
+        "description": "Delivery service plan",
+        "adjustable_series_id": "series_delivery",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_24",
+            "detail": null
+          },
+          {
+            "kind": "financial_event",
+            "ref_id": "event_31",
+            "detail": null
+          }
+        ],
+        "is_protected": false,
+        "source_event_id": null
+      },
+      {
+        "occurrence_id": "occ_salary_2024_04",
+        "date": "2024-04-15",
+        "direction": "inflow",
+        "amount": "23320",
+        "category": "salary",
+        "origin": "recurring_income_forecast",
+        "certainty": "forecast",
+        "description": "Monthly payroll credit",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_25",
+            "detail": null
+          },
+          {
+            "kind": "financial_event",
+            "ref_id": "event_103",
+            "detail": null
+          }
+        ],
+        "is_protected": false,
+        "adjustable_series_id": null,
+        "source_event_id": null
+      },
+      {
+        "occurrence_id": "occ_rent_2024_05",
+        "date": "2024-05-02",
+        "direction": "outflow",
+        "amount": "5148",
+        "category": "rent",
+        "origin": "recurring_expense_forecast",
+        "certainty": "forecast",
+        "description": "Apartment rent transfer",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_19",
+            "detail": null
+          },
+          {
+            "kind": "financial_event",
+            "ref_id": "event_26",
+            "detail": null
+          },
+          {
+            "kind": "financial_event",
+            "ref_id": "event_32",
+            "detail": null
+          }
+        ],
+        "is_protected": true,
+        "adjustable_series_id": null,
+        "source_event_id": null
+      }
+    ],
+    "adjustable_series": [
+      {
+        "series_id": "series_delivery",
+        "target_event_id": "event_31",
+        "category": "delivery_membership",
+        "action": "stop",
+        "current_amount": "306.90",
+        "minimum_allowed_amount": null,
+        "occurrence_ids": [
+          "occ_delivery_2024_03",
+          "occ_delivery_2024_04"
+        ],
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_24",
+            "detail": null
+          },
+          {
+            "kind": "financial_event",
+            "ref_id": "event_31",
+            "detail": null
+          }
+        ]
+      }
+    ],
+    "evidence_resolutions": [],
+    "excluded_evidence": [
+      {
+        "source": {
+          "kind": "financial_event",
+          "ref_id": "event_100",
+          "detail": null
+        },
+        "reason": "cancelled",
+        "explanation": "Card authorization was cancelled and never took cash out of the account."
+      }
+    ],
+    "assumptions": [
+      "Groceries and transport are covered by the confirmed salary cycle."
+    ],
+    "attestation": {
+      "model_provider": "anthropic",
+      "model_name": "claude-opus-4-6",
+      "generated_at": "2026-09-13T02:00:00+05:30",
+      "attested": true,
+      "notes": null
+    }
+  },
+  "request": {
+    "schema_version": "1.0.0",
+    "request_id": "request_01",
+    "user_id": "user_01",
+    "request_date": "2024-03-03",
+    "request_type": "purchase",
+    "requested_amount": "25256",
+    "currency": "ZAR",
+    "desired_completion_date": "2024-03-20",
+    "allows_partial_payment": true,
+    "request_text": "Would paying for the laptop today leave enough for my regular expenses? The laptop I'm looking at is ZAR 25,256.",
+    "payment_options": [
+      {
+        "payment_option_id": "payment_option_01",
+        "method": "full_payment",
+        "payment_amount": "25256",
+        "number_of_payments": 1,
+        "first_payment_date": "2024-03-03",
+        "payment_frequency_days": null,
+        "financing_fee": "0",
+        "total_payable_amount": "25256",
+        "schedule": [
+          {
+            "date": "2024-03-03",
+            "amount": "25256"
+          }
+        ]
+      },
+      {
+        "payment_option_id": "payment_option_03",
+        "method": "installments",
+        "payment_amount": "4546.08",
+        "number_of_payments": 6,
+        "first_payment_date": "2024-03-10",
+        "payment_frequency_days": 31,
+        "financing_fee": "2020.48",
+        "total_payable_amount": "27276.48",
+        "schedule": [
+          {
+            "date": "2024-03-10",
+            "amount": "4546.08"
+          },
+          {
+            "date": "2024-04-10",
+            "amount": "4546.08"
+          },
+          {
+            "date": "2024-05-20",
+            "amount": "4546.08"
+          },
+          {
+            "date": "2024-06-11",
+            "amount": "4546.08"
+          },
+          {
+            "date": "2024-07-12",
+            "amount": "4546.08"
+          },
+          {
+            "date": "2024-08-12",
+            "amount": "4546.08"
+          }
+        ]
+      }
+    ]
+  }
+}

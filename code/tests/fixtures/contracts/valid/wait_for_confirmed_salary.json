@@ -1,0 +1,437 @@
+{
+  "schema_version": "1.0.0",
+  "financial_state": {
+    "schema_version": "1.0.0",
+    "user_id": "user_03",
+    "home_currency": "IDR",
+    "as_of_date": "2019-09-03",
+    "forecast_end_date": "2019-12-02",
+    "opening_balance": "5810300",
+    "minimum_balance_to_keep": "2668700",
+    "preferences": {
+      "financial_priorities": [
+        "retirement_investment",
+        "emergency_savings"
+      ],
+      "protected_categories": [
+        "rent",
+        "utilities",
+        "groceries"
+      ],
+      "reducible_categories": [
+        "streaming",
+        "shopping"
+      ],
+      "stoppable_categories": [
+        "streaming",
+        "cloud_storage"
+      ],
+      "accepted_payment_methods": [
+        "full_payment",
+        "partial_payment",
+        "installments"
+      ],
+      "max_installment_months": 2
+    },
+    "cash_flows": [
+      {
+        "occurrence_id": "occ_pending_pharmacy",
+        "date": "2019-09-07",
+        "direction": "outflow",
+        "amount": "95000",
+        "category": "healthcare",
+        "origin": "reserved_pending_debit",
+        "certainty": "confirmed",
+        "description": "Pending pharmacy card charge",
+        "source_event_id": "event_254",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_254",
+            "detail": null
+          }
+        ],
+        "is_protected": false,
+        "adjustable_series_id": null
+      },
+      {
+        "occurrence_id": "occ_streaming_2019_09",
+        "date": "2019-09-11",
+        "direction": "outflow",
+        "amount": "117800",
+        "category": "streaming",
+        "origin": "recurring_expense_forecast",
+        "certainty": "forecast",
+        "description": "Video streaming plan",
+        "adjustable_series_id": "series_streaming",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_208",
+            "detail": null
+          },
+          {
+            "kind": "financial_event",
+            "ref_id": "event_215",
+            "detail": null
+          }
+        ],
+        "is_protected": false,
+        "source_event_id": null
+      },
+      {
+        "occurrence_id": "occ_salary_2019_09",
+        "date": "2019-09-15",
+        "direction": "inflow",
+        "amount": "4365000",
+        "category": "salary",
+        "origin": "recurring_income_forecast",
+        "certainty": "forecast",
+        "description": "Payroll credit",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_204",
+            "detail": null
+          },
+          {
+            "kind": "financial_event",
+            "ref_id": "event_210",
+            "detail": null
+          }
+        ],
+        "is_protected": false,
+        "adjustable_series_id": null,
+        "source_event_id": null
+      },
+      {
+        "occurrence_id": "occ_rent_2019_10",
+        "date": "2019-10-04",
+        "direction": "outflow",
+        "amount": "1140000",
+        "category": "rent",
+        "origin": "recurring_expense_forecast",
+        "certainty": "forecast",
+        "description": "Landlord standing order",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_205",
+            "detail": null
+          },
+          {
+            "kind": "financial_event",
+            "ref_id": "event_212",
+            "detail": null
+          }
+        ],
+        "is_protected": true,
+        "adjustable_series_id": null,
+        "source_event_id": null
+      },
+      {
+        "occurrence_id": "occ_streaming_2019_10",
+        "date": "2019-10-11",
+        "direction": "outflow",
+        "amount": "117800",
+        "category": "streaming",
+        "origin": "recurring_expense_forecast",
+        "certainty": "forecast",
+        "description": "Video streaming plan",
+        "adjustable_series_id": "series_streaming",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_208",
+            "detail": null
+          },
+          {
+            "kind": "financial_event",
+            "ref_id": "event_215",
+            "detail": null
+          }
+        ],
+        "is_protected": false,
+        "source_event_id": null
+      },
+      {
+        "occurrence_id": "occ_salary_2019_10",
+        "date": "2019-10-15",
+        "direction": "inflow",
+        "amount": "4365000",
+        "category": "salary",
+        "origin": "recurring_income_forecast",
+        "certainty": "forecast",
+        "description": "Payroll credit",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_204",
+            "detail": null
+          },
+          {
+            "kind": "financial_event",
+            "ref_id": "event_210",
+            "detail": null
+          }
+        ],
+        "is_protected": false,
+        "adjustable_series_id": null,
+        "source_event_id": null
+      },
+      {
+        "occurrence_id": "occ_rent_2019_11",
+        "date": "2019-11-04",
+        "direction": "outflow",
+        "amount": "1140000",
+        "category": "rent",
+        "origin": "recurring_expense_forecast",
+        "certainty": "forecast",
+        "description": "Landlord standing order",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_205",
+            "detail": null
+          },
+          {
+            "kind": "financial_event",
+            "ref_id": "event_212",
+            "detail": null
+          }
+        ],
+        "is_protected": true,
+        "adjustable_series_id": null,
+        "source_event_id": null
+      },
+      {
+        "occurrence_id": "occ_salary_2019_11",
+        "date": "2019-11-15",
+        "direction": "inflow",
+        "amount": "4365000",
+        "category": "salary",
+        "origin": "recurring_income_forecast",
+        "certainty": "forecast",
+        "description": "Payroll credit",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_204",
+            "detail": null
+          },
+          {
+            "kind": "financial_event",
+            "ref_id": "event_210",
+            "detail": null
+          }
+        ],
+        "is_protected": false,
+        "adjustable_series_id": null,
+        "source_event_id": null
+      }
+    ],
+    "adjustable_series": [
+      {
+        "series_id": "series_streaming",
+        "target_event_id": "event_215",
+        "category": "streaming",
+        "action": "stop_or_reduce",
+        "current_amount": "117800",
+        "minimum_allowed_amount": "58900",
+        "occurrence_ids": [
+          "occ_streaming_2019_09",
+          "occ_streaming_2019_10"
+        ],
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_208",
+            "detail": null
+          },
+          {
+            "kind": "financial_event",
+            "ref_id": "event_215",
+            "detail": null
+          }
+        ]
+      }
+    ],
+    "evidence_resolutions": [
+      {
+        "resolution_id": "res_august_salary",
+        "summary": "event_253 had no amount; the payslip image shows net pay of IDR 4,365,000.",
+        "basis": "settled_over_estimate",
+        "sources": [
+          {
+            "kind": "financial_event",
+            "ref_id": "event_253",
+            "detail": null
+          },
+          {
+            "kind": "image",
+            "ref_id": "image_01",
+            "detail": null
+          }
+        ],
+        "affected_occurrence_ids": [],
+        "is_conservative_fallback": false
+      }
+    ],
+    "excluded_evidence": [
+      {
+        "source": {
+          "kind": "financial_event",
+          "ref_id": "event_253",
+          "detail": null
+        },
+        "reason": "outside_forecast_window",
+        "explanation": "Settled on 2019-08-31, so it is already inside the opening balance."
+      },
+      {
+        "source": {
+          "kind": "message",
+          "ref_id": "message_02",
+          "detail": null
+        },
+        "reason": "unconfirmed_income",
+        "explanation": "Payroll confirms only the regular salary; the one-off adjustment has no amount or date."
+      }
+    ],
+    "assumptions": [
+      "Regular payroll of IDR 4,365,000 continues on the 15th of each month."
+    ],
+    "attestation": {
+      "model_provider": "anthropic",
+      "model_name": "claude-opus-4-6",
+      "generated_at": "2026-09-13T02:00:00+05:30",
+      "attested": true,
+      "notes": null
+    }
+  },
+  "request": {
+    "schema_version": "1.0.0",
+    "request_id": "request_03",
+    "user_id": "user_03",
+    "request_date": "2019-09-03",
+    "request_type": "education",
+    "requested_amount": "5491000",
+    "currency": "IDR",
+    "desired_completion_date": "2019-11-15",
+    "allows_partial_payment": false,
+    "request_text": "Should I pay for the course now, use installments, or wait? I need to decide by 15 November 2019. The course I want to take is IDR 5,491,000.",
+    "payment_options": [
+      {
+        "payment_option_id": "payment_option_08",
+        "method": "full_payment",
+        "payment_amount": "5491000",
+        "number_of_payments": 1,
+        "first_payment_date": "2019-09-03",
+        "payment_frequency_days": null,
+        "financing_fee": "0",
+        "total_payable_amount": "5491000",
+        "schedule": [
+          {
+            "date": "2019-09-03",
+            "amount": "5491000"
+          }
+        ]
+      },
+      {
+        "payment_option_id": "payment_option_09",
+        "method": "installments",
+        "payment_amount": "308541.9",
+        "number_of_payments": 21,
+        "first_payment_date": "2019-09-17",
+        "payment_frequency_days": 28,
+        "financing_fee": "988379.9",
+        "total_payable_amount": "6479379.9",
+        "schedule": [
+          {
+            "date": "2019-09-17",
+            "amount": "308541.9"
+          },
+          {
+            "date": "2019-10-15",
+            "amount": "308541.9"
+          },
+          {
+            "date": "2019-11-12",
+            "amount": "308541.9"
+          },
+          {
+            "date": "2019-12-10",
+            "amount": "308541.9"
+          },
+          {
+            "date": "2020-01-07",
+            "amount": "308541.9"
+          },
+          {
+            "date": "2020-02-04",
+            "amount": "308541.9"
+          },
+          {
+            "date": "2020-03-03",
+            "amount": "308541.9"
+          },
+          {
+            "date": "2020-03-31",
+            "amount": "308541.9"
+          },
+          {
+            "date": "2020-04-28",
+            "amount": "308541.9"
+          },
+          {
+            "date": "2020-05-26",
+            "amount": "308541.9"
+          },
+          {
+            "date": "2020-06-23",
+            "amount": "308541.9"
+          },
+          {
+            "date": "2020-07-21",
+            "amount": "308541.9"
+          },
+          {
+            "date": "2020-08-18",
+            "amount": "308541.9"
+          },
+          {
+            "date": "2020-09-15",
+            "amount": "308541.9"
+          },
+          {
+            "date": "2020-10-13",
+            "amount": "308541.9"
+          },
+          {
+            "date": "2020-11-10",
+            "amount": "308541.9"
+          },
+          {
+            "date": "2020-12-08",
+            "amount": "308541.9"
+          },
+          {
+            "date": "2021-01-05",
+            "amount": "308541.9"
+          },
+          {
+            "date": "2021-02-02",
+            "amount": "308541.9"
+          },
+          {
+            "date": "2021-03-02",
+            "amount": "308541.9"
+          },
+          {
+            "date": "2021-03-30",
+            "amount": "308541.9"
+          }
+        ]
+      }
+    ]
+  }
+}
