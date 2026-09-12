@@ -1,7 +1,0 @@
-{
-  "git.useIntegratedAskPass": false,
-  "git.terminalAuthentication": false,
-  "terminal.integrated.env.osx": {
-    "GH_CONFIG_DIR": "${workspaceFolder}/.gh"
-  }
-}
