@@ -1,2 +1,5 @@
 pydantic>=2.7,<3
 pytest>=8.0
+pytest-asyncio>=0.24,<2
+claude-agent-sdk>=0.1,<1
+python-dotenv>=1.0,<2

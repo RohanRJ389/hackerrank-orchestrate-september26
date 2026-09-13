@@ -22,6 +22,9 @@ htmlcov/
 .nox/
 .hypothesis/
 .cache/
+normalizer-traces/
+normalizer-cache/
+normalizer-sandboxes/
 
 # Virtualenvs and packaging
 .venv/
