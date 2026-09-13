@@ -6,6 +6,7 @@ import asyncio
 import hashlib
 import json
 import os
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
@@ -13,11 +14,11 @@ from typing import Iterable
 from contracts import DecisionInput, assert_valid
 from dotenv import load_dotenv
 
-from .assembler import build_decision_input, state_hash
+from .assembler import build_decision_input
 from .candidates import build_packet
-from .claude import AgentRun, AgentRunner, HAIKU_MODEL
+from .claude import AgentRun, AgentRunner, HAIKU_MODEL, parse_max_turns
+from .prompts import PROMPT_VERSION
 from .dataset import DEFAULT_DATASET, Dataset
-from .models import NormalizationDirectives
 from .workspace import request_workspace
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -37,7 +38,7 @@ def _fingerprint(dataset: Dataset, request_id: str, model: str) -> str:
     payload = {
         "request_id": request_id,
         "model": model,
-        "prompt_version": "1.0.0",
+        "prompt_version": PROMPT_VERSION,
         "profile": bundle.profile,
         "request": bundle.request,
         "options": bundle.payment_options,
@@ -59,42 +60,72 @@ def _fingerprint(dataset: Dataset, request_id: str, model: str) -> str:
     return hashlib.sha256(canonical.encode()).hexdigest()
 
 
-def _record_usage(path: Path, request_id: str, run: AgentRun, retry: int) -> None:
+def _record_usage(
+    path: Path,
+    request_id: str,
+    *,
+    model: str,
+    retry: int,
+    wall_ms: int,
+    started_at: str,
+    ended_at: str,
+    run: AgentRun | None = None,
+    error: str | None = None,
+) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     record = {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": ended_at,
+        "started_at": started_at,
+        "ended_at": ended_at,
         "request_id": request_id,
-        "model": run.model,
-        "duration_ms": run.duration_ms,
-        "turns": run.turns,
-        "cost_usd": run.cost_usd,
-        "usage": run.usage,
-        "model_usage": run.model_usage,
-        "session_id": run.session_id,
+        "model": model if run is None else run.model,
+        "wall_ms": wall_ms,
+        "wall_s": round(wall_ms / 1000, 3),
+        "duration_ms": None if run is None else run.duration_ms,
+        "turns": None if run is None else run.turns,
+        "cost_usd": None if run is None else run.cost_usd,
+        "usage": None if run is None else run.usage,
+        "model_usage": None if run is None else run.model_usage,
+        "session_id": None if run is None else run.session_id,
         "retry": retry,
+        "error": error,
     }
     with path.open("a", encoding="utf-8") as handle:
         handle.write(json.dumps(record, default=str) + "\n")
+    timing_path = path.with_name("timing.jsonl")
+    with timing_path.open("a", encoding="utf-8") as handle:
+        handle.write(
+            json.dumps(
+                {
+                    "request_id": request_id,
+                    "model": record["model"],
+                    "retry": retry,
+                    "started_at": started_at,
+                    "ended_at": ended_at,
+                    "wall_ms": wall_ms,
+                    "wall_s": record["wall_s"],
+                    "sdk_duration_ms": record["duration_ms"],
+                    "turns": record["turns"],
+                    "cost_usd": record["cost_usd"],
+                    "ok": error is None,
+                    "error": error,
+                },
+                default=str,
+            )
+            + "\n"
+        )
 
 
-def _attach_approval(
+def _attach_attestation(
     decision_input: DecisionInput, run: AgentRun
 ) -> DecisionInput:
-    digest = state_hash(decision_input.financial_state)
-    if digest != run.approval.state_hash:
-        raise ValueError(
-            f"approved hash {run.approval.state_hash} does not match draft {digest}"
-        )
     attestation = decision_input.financial_state.attestation.model_copy(
         update={
             "model_provider": "anthropic",
             "model_name": run.model,
             "generated_at": datetime.now(timezone.utc),
             "attested": True,
-            "notes": (
-                f"approved_unsigned_state_sha256={digest}; "
-                f"{run.approval.notes}"
-            )[:1000],
+            "notes": "assembled_from_model_directives",
         }
     )
     final = decision_input.model_copy(
@@ -122,7 +153,7 @@ async def normalize_async(
     selected_model = model or os.environ.get("NORMALIZER_MODEL", HAIKU_MODEL)
     runner = runner or AgentRunner(
         model=selected_model,
-        max_turns=int(os.environ.get("NORMALIZER_MAX_TURNS", "12")),
+        max_turns=parse_max_turns(os.environ.get("NORMALIZER_MAX_TURNS")),
         max_budget_usd=float(os.environ.get("NORMALIZER_MAX_BUDGET_USD", "1.0")),
         trace_root=DEFAULT_TRACES,
     )
@@ -137,31 +168,31 @@ async def normalize_async(
     packet = build_packet(dataset, request_id)
     last_error: Exception | None = None
     with request_workspace(dataset, packet, keep=keep_workspace) as (workspace, staged):
-        empty = NormalizationDirectives(request_id=request_id)
-        _write_json(workspace / "directives.json", empty.model_dump(mode="json"))
-        baseline, warnings = build_decision_input(
-            dataset, packet, empty, model="pending-review"
-        )
-        _write_json(workspace / "draft.json", baseline.model_dump(mode="json"))
-        _write_json(
-            workspace / "summary.json",
-            {
-                "request_id": request_id,
-                "state_hash": state_hash(baseline.financial_state),
-                "warnings": warnings,
-                "cash_flow_count": len(baseline.financial_state.cash_flows),
-            },
-        )
         for retry in range(2):
+            started_at = datetime.now(timezone.utc).isoformat()
+            started = time.monotonic()
+            run: AgentRun | None = None
             try:
-                run = await runner.run(workspace, request_id, staged.route)
-                draft = DecisionInput.model_validate_json(
-                    (workspace / "draft.json").read_text(encoding="utf-8")
+                run = await runner.run(
+                    workspace, request_id, staged.route, packet=staged
                 )
-                assert_valid(draft)
-                final = _attach_approval(draft, run)
+                _write_json(
+                    workspace / "directives.json",
+                    run.directives.model_dump(mode="json"),
+                )
+                assembled, _warnings = build_decision_input(
+                    dataset, packet, run.directives, model=run.model
+                )
+                final = _attach_attestation(assembled, run)
                 _record_usage(
-                    DEFAULT_TRACES / "usage.jsonl", request_id, run, retry
+                    DEFAULT_TRACES / "usage.jsonl",
+                    request_id,
+                    model=selected_model,
+                    retry=retry,
+                    wall_ms=int((time.monotonic() - started) * 1000),
+                    started_at=started_at,
+                    ended_at=datetime.now(timezone.utc).isoformat(),
+                    run=run,
                 )
                 if use_cache:
                     cache_root.mkdir(parents=True, exist_ok=True)
@@ -169,12 +200,23 @@ async def normalize_async(
                 return final
             except Exception as error:
                 last_error = error
+                _record_usage(
+                    DEFAULT_TRACES / "usage.jsonl",
+                    request_id,
+                    model=selected_model,
+                    retry=retry,
+                    wall_ms=int((time.monotonic() - started) * 1000),
+                    started_at=started_at,
+                    ended_at=datetime.now(timezone.utc).isoformat(),
+                    run=run,
+                    error=str(error),
+                )
                 _write_json(
                     workspace / "retry_feedback.json",
                     {
                         "attempt": retry + 1,
                         "error": str(error),
-                        "instruction": "Correct or rebuild draft.json, then sign its exact hash.",
+                        "instruction": "Fix the directives and return them again.",
                     },
                 )
         raise RuntimeError(

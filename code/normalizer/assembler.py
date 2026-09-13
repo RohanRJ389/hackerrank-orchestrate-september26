@@ -404,13 +404,13 @@ class StateAssembler:
                 )
                 when += timedelta(days=7)
 
-    def _attestation(self, model: str, state_hash: str = "pending") -> dict[str, Any]:
+    def _attestation(self, model: str) -> dict[str, Any]:
         return {
             "model_provider": "anthropic" if model != "deterministic" else "deterministic",
             "model_name": model,
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "attested": True,
-            "notes": f"approved_unsigned_state_sha256={state_hash}",
+            "notes": "assembled_from_model_directives",
         }
 
     def _enriched_request(self) -> dict[str, Any]:
@@ -524,25 +524,10 @@ def build_decision_input(
     directives: NormalizationDirectives | None = None,
     *,
     model: str = "pending",
-    approved_hash: str | None = None,
 ) -> tuple[DecisionInput, list[str]]:
     document = StateAssembler(dataset, packet, directives).document(model=model)
     decision_input = DecisionInput.model_validate(document)
     warnings = [str(item) for item in assert_valid(decision_input)]
-    digest = state_hash(decision_input.financial_state)
-    if approved_hash is not None and approved_hash != digest:
-        raise ValueError("model-approved hash does not match assembled state")
-    if approved_hash is not None:
-        attestation = decision_input.financial_state.attestation.model_copy(
-            update={"notes": f"approved_unsigned_state_sha256={approved_hash}"}
-        )
-        decision_input = decision_input.model_copy(
-            update={
-                "financial_state": decision_input.financial_state.model_copy(
-                    update={"attestation": attestation}
-                )
-            }
-        )
     return decision_input, warnings
 
 

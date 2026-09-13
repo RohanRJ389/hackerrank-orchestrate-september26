@@ -3,7 +3,7 @@
 from .assembler import build_decision_input, state_hash, try_build
 from .candidates import build_packet
 from .dataset import Dataset, RequestBundle
-from .models import NormalizationDirectives, NormalizationPacket, SignedStateApproval
+from .models import NormalizationDirectives, NormalizationPacket
 from .normalize import normalize, normalize_async, normalize_many
 
 __all__ = [
@@ -11,7 +11,6 @@ __all__ = [
     "NormalizationDirectives",
     "NormalizationPacket",
     "RequestBundle",
-    "SignedStateApproval",
     "build_decision_input",
     "build_packet",
     "normalize",

@@ -35,7 +35,7 @@ async def test_live_normalization_produces_signed_valid_state(request_id):
         keep_workspace=False,
     )
     assert decision_input.financial_state.attestation.model_provider == "anthropic"
-    assert "approved_unsigned_state_sha256=" in (
+    assert "assembled_from_model_directives" in (
         decision_input.financial_state.attestation.notes or ""
     )
     assert_valid(decision_input)

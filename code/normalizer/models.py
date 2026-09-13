@@ -116,13 +116,6 @@ class DraftResult(InternalModel):
     warnings: tuple[str, ...] = ()
 
 
-class SignedStateApproval(InternalModel):
-    request_id: str
-    state_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
-    approved: Literal[True]
-    notes: str = Field(default="", max_length=800)
-
-
 class BenchmarkResult(InternalModel):
     request_id: str
     model: str

@@ -19,15 +19,17 @@ from normalizer.dataset import Dataset
 from normalizer.models import (
     CandidateDecision,
     NormalizationDirectives,
+    NormalizationPacket,
     Route,
-    SignedStateApproval,
 )
 from normalizer.normalize import normalize_async
 from normalizer.prompts import (
     PROMPT_TOKEN_BUDGET,
     SYSTEM_PROMPT,
     approximate_tokens,
+    listed_workspace_files,
     suspected_injection,
+    task_prompt,
 )
 from normalizer.trace import TraceWriter, redact
 from normalizer.usage import build_report
@@ -151,6 +153,50 @@ def test_injection_scanner_flags_dangerous_text(text):
 
 def test_prompt_stays_within_budget():
     assert approximate_tokens(SYSTEM_PROMPT) <= PROMPT_TOKEN_BUDGET
+    assert "explicitly provides all evidence required" in SYSTEM_PROMPT
+    assert "exactly once" in SYSTEM_PROMPT
+    assert "freely" not in SYSTEM_PROMPT
+
+
+def test_task_prompt_lists_relative_evidence_only():
+    prompt = task_prompt(
+        request_id="request_03",
+        route=Route.EVIDENCE_REVIEW,
+        files=[
+            "packet.json",
+            "images/image_01.png",
+            "messages/message_02.json",
+            "retry_feedback.json",
+        ],
+    )
+    assert "images/image_01.png" in prompt
+    assert "messages/message_02.json" in prompt
+    assert "retry_feedback.json" in prompt
+    assert "Do not read README.txt" in prompt
+    assert "/packet.json" not in prompt
+    assert "hash" not in prompt
+    assert "draft.json" in prompt
+    assert "exactly once" in prompt
+    assert "No other tools" in prompt
+
+
+def test_listed_workspace_files_skip_readme(tmp_path):
+    for name in (
+        "packet.json",
+        "event_history.json",
+        "README.txt",
+    ):
+        (tmp_path / name).write_text("{}\n", encoding="utf-8")
+    (tmp_path / "retry_feedback.json").write_text("{}\n", encoding="utf-8")
+    packet = NormalizationPacket.model_construct(
+        message_files=("messages/message_02.json",),
+        image_files=("images/image_01.png",),
+    )
+    files = listed_workspace_files(tmp_path, packet)
+    assert "README.txt" not in files
+    assert files[-1] == "retry_feedback.json"
+    assert "images/image_01.png" in files
+    assert "messages/message_02.json" in files
 
 
 def test_trace_redacts_secrets_pii_and_base64():
@@ -202,41 +248,40 @@ def test_usage_report_aggregates_models(tmp_path):
 
 
 @pytest.mark.asyncio
-async def test_bash_hook_removes_credentials_without_restricting_command(tmp_path):
+async def test_read_hook_allows_without_rewriting_input(tmp_path):
     trace = TraceWriter(tmp_path / "trace.jsonl", "run", "request_01")
     hooks = AgentRunner(trace_root=tmp_path)._hooks(trace)
     before = hooks["PreToolUse"][0].hooks[0]
-    command = "python custom_analysis.py | sort > result.txt"
     output = await before(
         {
-            "tool_name": "Bash",
-            "tool_input": {"command": command},
+            "tool_name": "Read",
+            "tool_input": {"file_path": "packet.json"},
             "tool_use_id": "tool_1",
         },
         None,
         None,
     )
-    wrapped = output["hookSpecificOutput"]["updatedInput"]["command"]
-    assert "-u ANTHROPIC_API_KEY" in wrapped
-    assert "-u ANTHROPIC_WORKSPACE_ID" in wrapped
-    assert "-u ANTHROPIC_CUSTOM_HEADERS" in wrapped
-    assert command in wrapped
+    assert output["hookSpecificOutput"]["permissionDecision"] == "allow"
+    assert "updatedInput" not in output["hookSpecificOutput"]
 
 
-def test_agent_exposes_only_read_and_bash(monkeypatch, tmp_path):
+def test_agent_exposes_only_read(monkeypatch, tmp_path):
     monkeypatch.setenv("ANTHROPIC_API_KEY", "not-a-real-key")
     monkeypatch.setenv("ANTHROPIC_WORKSPACE_ID", "wrkspc_test")
     trace = TraceWriter(tmp_path / "trace.jsonl", "run", "request_01")
     options = AgentRunner(trace_root=tmp_path)._options(
         tmp_path, "request_01", trace
     )
-    assert options.tools == ["Read", "Bash"]
-    assert options.allowed_tools == ["Read", "Bash"]
+    assert options.tools == ["Read"]
+    assert options.allowed_tools == ["Read"]
     assert options.mcp_servers == {}
+    assert options.max_turns is None
+    assert options.effort == "low"
+    assert options.thinking == {"type": "disabled"}
 
 
 class FakeSDKClient:
-    approval: dict = {}
+    directives: dict = {}
 
     def __init__(self, options):
         self.options = options
@@ -261,7 +306,7 @@ class FakeSDKClient:
             session_id="session",
             total_cost_usd=0.01,
             usage={"input_tokens": 10, "output_tokens": 2},
-            structured_output=self.approval,
+            structured_output=self.directives,
         )
 
 
@@ -269,20 +314,14 @@ class FakeSDKClient:
 async def test_agent_runner_captures_structured_result(monkeypatch, tmp_path):
     monkeypatch.setenv("ANTHROPIC_API_KEY", "not-a-real-key")
     monkeypatch.setenv("ANTHROPIC_WORKSPACE_ID", "wrkspc_test")
-    digest = "a" * 64
-    FakeSDKClient.approval = {
-        "request_id": "request_01",
-        "state_hash": digest,
-        "approved": True,
-        "notes": "ok",
-    }
+    FakeSDKClient.directives = {"request_id": "request_01"}
     runner = AgentRunner(
         model="fake",
         trace_root=tmp_path,
         client_factory=FakeSDKClient,
     )
     result = await runner.run(tmp_path, "request_01", Route.DETERMINISTIC_REVIEW)
-    assert result.approval.state_hash == digest
+    assert result.directives.request_id == "request_01"
     assert result.usage["input_tokens"] == 10
     trace_files = list(tmp_path.glob("*/*.jsonl"))
     assert len(trace_files) == 1
@@ -297,16 +336,9 @@ async def test_agent_runner_captures_structured_result(monkeypatch, tmp_path):
 class FakeRunner:
     model = "fake-claude"
 
-    async def run(self, workspace: Path, request_id: str, route: Route) -> AgentRun:
-        draft = json.loads((workspace / "draft.json").read_text())
-        from contracts import DecisionInput
-
-        parsed = DecisionInput.model_validate(draft)
-        digest = state_hash(parsed.financial_state)
+    async def run(self, workspace: Path, request_id: str, route: Route, packet=None) -> AgentRun:
         return AgentRun(
-            approval=SignedStateApproval(
-                request_id=request_id, state_hash=digest, approved=True
-            ),
+            directives=NormalizationDirectives(request_id=request_id),
             model=self.model,
             duration_ms=1,
             turns=1,
@@ -333,7 +365,7 @@ async def test_normalize_attaches_verified_model_approval(dataset, monkeypatch, 
         use_cache=True,
     )
     assert decision_input.financial_state.attestation.model_name == "fake-claude"
-    assert "approved_unsigned_state_sha256=" in (
+    assert "assembled_from_model_directives" in (
         decision_input.financial_state.attestation.notes or ""
     )
     assert_valid(decision_input)

@@ -51,17 +51,21 @@ async def benchmark(
     results = []
     for model in models:
         for request_id in request_ids:
+            started_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
             started = time.monotonic()
-            record = {"model": model, "request_id": request_id}
+            record = {"model": model, "request_id": request_id, "started_at": started_at}
             try:
                 decision_input = await normalize_async(
                     request_id, dataset=dataset, model=model, use_cache=False
                 )
                 row = decide(decision_input).to_row()
+                wall_ms = int((time.monotonic() - started) * 1000)
                 record.update(
                     {
                         "valid": True,
-                        "wall_ms": int((time.monotonic() - started) * 1000),
+                        "ended_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                        "wall_ms": wall_ms,
+                        "wall_s": round(wall_ms / 1000, 3),
                         "exact_fields": (
                             sum(row[field] == samples[request_id][field] for field in FIELDS)
                             if request_id in samples
@@ -71,10 +75,13 @@ async def benchmark(
                     }
                 )
             except Exception as error:
+                wall_ms = int((time.monotonic() - started) * 1000)
                 record.update(
                     {
                         "valid": False,
-                        "wall_ms": int((time.monotonic() - started) * 1000),
+                        "ended_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                        "wall_ms": wall_ms,
+                        "wall_s": round(wall_ms / 1000, 3),
                         "error": str(error),
                     }
                 )

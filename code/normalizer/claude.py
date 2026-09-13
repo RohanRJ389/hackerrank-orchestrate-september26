@@ -1,9 +1,8 @@
-"""Claude Agent SDK orchestration for evidence review and hash sign-off."""
+"""Claude Agent SDK orchestration for evidence review."""
 
 from __future__ import annotations
 
 import os
-import shlex
 import shutil
 import uuid
 from dataclasses import dataclass
@@ -16,10 +15,11 @@ from claude_agent_sdk import (
     ClaudeSDKClient,
     HookMatcher,
     ResultMessage,
+    ThinkingConfigDisabled,
 )
 
-from .models import Route, SignedStateApproval
-from .prompts import DETERMINISTIC_REVIEW_PROMPT, REVIEW_PROMPT, SYSTEM_PROMPT
+from .models import NormalizationDirectives, NormalizationPacket, Route
+from .prompts import SYSTEM_PROMPT, listed_workspace_files, task_prompt
 from .trace import TraceWriter
 
 HAIKU_MODEL = "claude-haiku-4-5"
@@ -28,7 +28,7 @@ SONNET_MODEL = "claude-sonnet-5"
 
 @dataclass(frozen=True)
 class AgentRun:
-    approval: SignedStateApproval
+    directives: NormalizationDirectives
     model: str
     duration_ms: int
     turns: int
@@ -62,12 +62,25 @@ def _event_type(message: Any) -> str:
     return type(message).__name__.lower()
 
 
+def parse_max_turns(value: str | None) -> int | None:
+    """Return a turn cap, or None when the cap is disabled.
+
+    Empty, 0, none, and unlimited all mean no SDK max_turns limit.
+    """
+    if value is None:
+        return None
+    stripped = value.strip().lower()
+    if stripped in {"", "0", "none", "unlimited"}:
+        return None
+    return int(stripped)
+
+
 class AgentRunner:
     def __init__(
         self,
         *,
         model: str = HAIKU_MODEL,
-        max_turns: int = 12,
+        max_turns: int | None = None,
         max_budget_usd: float = 1.0,
         trace_root: Path | None = None,
         client_factory: Callable[..., Any] = ClaudeSDKClient,
@@ -88,23 +101,12 @@ class AgentRunner:
                     "tool_use_id": input_data["tool_use_id"],
                 },
             )
-            output: dict[str, Any] = {
-                "hookEventName": "PreToolUse",
-                "permissionDecision": "allow",
-            }
-            if input_data["tool_name"] == "Bash":
-                original = input_data["tool_input"].get("command", "")
-                wrapped = (
-                    "/usr/bin/env -u ANTHROPIC_API_KEY "
-                    "-u ANTHROPIC_AUTH_TOKEN -u ANTHROPIC_WORKSPACE_ID "
-                    "-u ANTHROPIC_CUSTOM_HEADERS /bin/bash -lc "
-                    f"{shlex.quote(original)}"
-                )
-                output["updatedInput"] = {
-                    **input_data["tool_input"],
-                    "command": wrapped,
+            return {
+                "hookSpecificOutput": {
+                    "hookEventName": "PreToolUse",
+                    "permissionDecision": "allow",
                 }
-            return {"hookSpecificOutput": output}
+            }
 
         async def after(input_data, _tool_use_id, _context):
             trace.write(
@@ -129,11 +131,9 @@ class AgentRunner:
             return {}
 
         return {
-            "PreToolUse": [HookMatcher(matcher="Read|Bash", hooks=[before])],
-            "PostToolUse": [HookMatcher(matcher="Read|Bash", hooks=[after])],
-            "PostToolUseFailure": [
-                HookMatcher(matcher="Read|Bash", hooks=[failure])
-            ],
+            "PreToolUse": [HookMatcher(matcher="Read", hooks=[before])],
+            "PostToolUse": [HookMatcher(matcher="Read", hooks=[after])],
+            "PostToolUseFailure": [HookMatcher(matcher="Read", hooks=[failure])],
         }
 
     def _options(
@@ -160,12 +160,14 @@ class AgentRunner:
         }
         return ClaudeAgentOptions(
             model=self.model,
-            tools=["Read", "Bash"],
-            allowed_tools=["Read", "Bash"],
+            tools=["Read"],
+            allowed_tools=["Read"],
             system_prompt=SYSTEM_PROMPT,
             permission_mode="bypassPermissions",
             max_turns=self.max_turns,
             max_budget_usd=self.max_budget_usd,
+            effort="low",
+            thinking=ThinkingConfigDisabled(type="disabled"),
             cwd=workspace,
             cli_path=os.environ.get("CLAUDE_CLI_PATH") or shutil.which("claude"),
             env=environment,
@@ -173,24 +175,32 @@ class AgentRunner:
             hooks=self._hooks(trace),
             output_format={
                 "type": "json_schema",
-                "schema": SignedStateApproval.model_json_schema(),
+                "schema": NormalizationDirectives.model_json_schema(),
             },
             setting_sources=[],
         )
 
-    async def run(self, workspace: Path, request_id: str, route: Route) -> AgentRun:
+    async def run(
+        self,
+        workspace: Path,
+        request_id: str,
+        route: Route,
+        packet: NormalizationPacket | None = None,
+    ) -> AgentRun:
         run_id = str(uuid.uuid4())
         trace = TraceWriter(
             self.trace_root / run_id / f"{request_id}.jsonl", run_id, request_id
         )
+        files = listed_workspace_files(workspace, packet)
+        prompt = task_prompt(request_id=request_id, route=route, files=files)
         trace.write(
             "agent_start",
-            {"model": self.model, "route": route.value, "workspace": workspace.name},
-        )
-        prompt = (
-            DETERMINISTIC_REVIEW_PROMPT
-            if route is Route.DETERMINISTIC_REVIEW
-            else REVIEW_PROMPT
+            {
+                "model": self.model,
+                "route": route.value,
+                "workspace": workspace.name,
+                "listed_files": files,
+            },
         )
         result: ResultMessage | None = None
         async with self.client_factory(
@@ -208,12 +218,12 @@ class AgentRunner:
                 f"agent failed: subtype={result.subtype}, result={result.result}"
             )
         if result.structured_output is None:
-            raise RuntimeError("agent returned no structured sign-off")
-        approval = SignedStateApproval.model_validate(result.structured_output)
-        if approval.request_id != request_id:
-            raise ValueError("agent approved a different request")
+            raise RuntimeError("agent returned no directives")
+        directives = NormalizationDirectives.model_validate(result.structured_output)
+        if directives.request_id != request_id:
+            raise ValueError("agent returned directives for a different request")
         return AgentRun(
-            approval=approval,
+            directives=directives,
             model=self.model,
             duration_ms=result.duration_ms,
             turns=result.num_turns,
