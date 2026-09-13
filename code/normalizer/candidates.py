@@ -10,6 +10,7 @@ from statistics import median, pstdev
 from .dataset import Dataset, Event, RequestBundle
 from .models import (
     CandidateKind,
+    EvidenceLink,
     NormalizationPacket,
     RecurrenceCandidate,
     Route,
@@ -174,6 +175,102 @@ def _future_events(bundle: RequestBundle, as_of: date) -> tuple[dict, ...]:
     )
 
 
+def _evidence_links(bundle: RequestBundle) -> tuple[EvidenceLink, ...]:
+    events = {event.event_id: event for event in bundle.events}
+    links: list[EvidenceLink] = []
+    for message in bundle.messages:
+        event = events.get(message.related_event_id) if message.related_event_id else None
+        links.append(_link("message", message.message_id, event))
+    for image in bundle.images:
+        event = events.get(image.related_event_id) if image.related_event_id else None
+        links.append(_link("image", image.image_id, event))
+    return tuple(links)
+
+
+def _link(kind: str, ref_id: str, event: Event | None) -> EvidenceLink:
+    if event is None:
+        return EvidenceLink(kind=kind, ref_id=ref_id)
+    return EvidenceLink(
+        kind=kind,
+        ref_id=ref_id,
+        related_event_id=event.event_id,
+        event_status=event.status,
+        event_amount_missing=event.amount is None,
+        event_is_future=event.status != "settled",
+    )
+
+
+def _amount_histogram(events: list[Event]) -> str:
+    counts: dict[Decimal, list[str]] = defaultdict(list)
+    missing: list[str] = []
+    for event in events:
+        if event.amount is None:
+            missing.append(event.event_id)
+        else:
+            counts[event.amount].append(event.event_id)
+    parts = [
+        f"{format(amount, 'f')}x{len(ids)} ({','.join(ids)})"
+        for amount, ids in sorted(counts.items())
+    ]
+    if missing:
+        parts.append(f"amount-missing ({','.join(missing)})")
+    return "; ".join(parts)
+
+
+def _review_hints(
+    bundle: RequestBundle,
+    candidates: list[RecurrenceCandidate],
+    future_events: tuple[dict, ...],
+    links: tuple[EvidenceLink, ...],
+) -> tuple[str, ...]:
+    events = {event.event_id: event for event in bundle.events}
+    hints: list[str] = []
+    for candidate in candidates:
+        cited = [events[event_id] for event_id in candidate.source_event_ids if event_id in events]
+        amounts = {event.amount for event in cited if event.amount is not None}
+        missing = [event.event_id for event in cited if event.amount is None]
+        if len(amounts) > 1 or missing:
+            hints.append(
+                f"{candidate.candidate_id} uses amount {format(candidate.amount, 'f')} "
+                f"and anchor {candidate.anchor_date.isoformat()} from the latest cited source; "
+                f"cited source amounts: {_amount_histogram(cited)}"
+            )
+    for link in links:
+        if link.related_event_id:
+            amount_note = "amount missing" if link.event_amount_missing else "amount present"
+            window = (
+                "forecast-window event"
+                if link.event_is_future
+                else "settled history (already in opening_balance)"
+            )
+            hints.append(
+                f"{link.ref_id} relates to {link.related_event_id} "
+                f"(status={link.event_status}, {amount_note}, {window})"
+            )
+        else:
+            hints.append(f"{link.ref_id} has no related_event_id")
+    linked_ids = {link.related_event_id for link in links if link.related_event_id}
+    for raw in future_events:
+        if raw.get("amount") is None and raw["event_id"] not in linked_ids:
+            hints.append(
+                f"{raw['event_id']} is a future {raw['status']} event with missing amount"
+            )
+        if raw.get("status") == "pending" and raw.get("direction") == "credit":
+            amount = raw.get("amount")
+            amount_note = "amount missing" if amount is None else f"amount {amount}"
+            hints.append(f"{raw['event_id']} is a pending credit ({amount_note})")
+    for event in bundle.events:
+        if (
+            event.amount is None
+            and event.status == "settled"
+            and event.event_id not in linked_ids
+        ):
+            hints.append(
+                f"{event.event_id} is settled with missing amount; already in opening_balance"
+            )
+    return tuple(hints)
+
+
 def build_packet(dataset: Dataset, request_id: str) -> NormalizationPacket:
     bundle = dataset.bundle(request_id)
     as_of = date.fromisoformat(bundle.request["request_date"])
@@ -181,9 +278,16 @@ def build_packet(dataset: Dataset, request_id: str) -> NormalizationPacket:
     salary = _salary_candidate(bundle)
     if salary is not None:
         candidates.insert(0, salary)
+    future_events = _future_events(bundle, as_of)
+    links = _evidence_links(bundle)
     warnings = []
-    if any(event.amount is None for event in bundle.events):
-        warnings.append("One or more events need an image-derived amount.")
+    if any(event.amount is None for event in bundle.events if event.status != "settled"):
+        warnings.append("One or more future events need an image-derived amount.")
+    if any(event.amount is None for event in bundle.events if event.status == "settled"):
+        warnings.append(
+            "One or more settled events have a missing amount; "
+            "they are already reflected in opening_balance."
+        )
     for message in bundle.messages:
         if suspected_injection(message.message_text):
             warnings.append(
@@ -201,8 +305,10 @@ def build_packet(dataset: Dataset, request_id: str) -> NormalizationPacket:
         profile=bundle.profile,
         request=bundle.request,
         payment_options=bundle.payment_options,
-        future_events=_future_events(bundle, as_of),
+        future_events=future_events,
         recurrence_candidates=tuple(candidates),
         variable_budgets=tuple(_variable_budgets(bundle, dataset, as_of)),
+        evidence_links=links,
+        review_hints=_review_hints(bundle, candidates, future_events, links),
         warnings=tuple(warnings),
     )

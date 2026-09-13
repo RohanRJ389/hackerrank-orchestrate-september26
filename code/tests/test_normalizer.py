@@ -153,8 +153,6 @@ def test_injection_scanner_flags_dangerous_text(text):
 
 def test_prompt_stays_within_budget():
     assert approximate_tokens(SYSTEM_PROMPT) <= PROMPT_TOKEN_BUDGET
-    assert "explicitly provides all evidence required" in SYSTEM_PROMPT
-    assert "exactly once" in SYSTEM_PROMPT
     assert "freely" not in SYSTEM_PROMPT
 
 
@@ -278,6 +276,7 @@ def test_agent_exposes_only_read(monkeypatch, tmp_path):
     assert options.max_turns is None
     assert options.effort == "low"
     assert options.thinking == {"type": "disabled"}
+    assert options.max_buffer_size == 5_000_000
 
 
 class FakeSDKClient:

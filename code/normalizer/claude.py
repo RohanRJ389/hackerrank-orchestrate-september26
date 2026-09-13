@@ -178,6 +178,7 @@ class AgentRunner:
                 "schema": NormalizationDirectives.model_json_schema(),
             },
             setting_sources=[],
+            max_buffer_size=5_000_000,
         )
 
     async def run(

@@ -181,7 +181,11 @@ class StateAssembler:
             if decision and decision.action == "exclude":
                 self._exclude(
                     event,
-                    decision.exclusion_reason or "superseded_by_amendment",
+                    (
+                        decision.exclusion_reason.value
+                        if decision.exclusion_reason
+                        else "superseded_by_amendment"
+                    ),
                     decision.rationale or "Excluded by model review.",
                 )
                 continue
@@ -228,7 +232,11 @@ class StateAssembler:
                 amount=amount,
                 currency=event.currency,
                 category=category,
-                origin=decision.origin if decision and decision.origin else origin,
+                origin=(
+                    decision.origin.value
+                    if decision and decision.origin
+                    else origin
+                ),
                 certainty="confirmed",
                 description=event.description,
                 source_refs=refs,
@@ -257,8 +265,15 @@ class StateAssembler:
                 amount=decision.amount,
                 currency=self.home,
                 category=decision.category,
-                origin=decision.origin
-                or ("confirmed_income" if decision.direction == "credit" else "committed_one_time_debit"),
+                origin=(
+                    decision.origin.value
+                    if decision.origin
+                    else (
+                        "confirmed_income"
+                        if decision.direction == "credit"
+                        else "committed_one_time_debit"
+                    )
+                ),
                 certainty="confirmed",
                 description=decision.rationale or "Model-confirmed financial fact",
                 source_refs=decision.source_refs or (decision.event_id,),
