@@ -1,0 +1,10 @@
+{
+  "request_id": "request_25",
+  "amount_safe_to_pay": "8683950",
+  "affordability_status": "not_affordable",
+  "recommended_payment_method": "not_recommended",
+  "payment_plan": "none",
+  "earliest_date_for_full_payment": "",
+  "spending_changes_needed": "none",
+  "decision_explanation": "Do not proceed with the IDR 60,496,000 request. Although IDR 8,683,950 is available today, the full amount cannot be completed safely within 90 days."
+}

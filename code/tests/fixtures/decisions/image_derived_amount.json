@@ -1,0 +1,10 @@
+{
+  "request_id": "request_16",
+  "amount_safe_to_pay": "122500",
+  "affordability_status": "affordable_now",
+  "recommended_payment_method": "full_payment",
+  "payment_plan": "2023-08-12:122500",
+  "earliest_date_for_full_payment": "2023-08-12",
+  "spending_changes_needed": "none",
+  "decision_explanation": "Pay INR 122,500 today. This leaves at least INR 122,400 available."
+}

@@ -1,0 +1,10 @@
+{
+  "request_id": "request_06",
+  "amount_safe_to_pay": "620.4",
+  "affordability_status": "affordable_now",
+  "recommended_payment_method": "full_payment",
+  "payment_plan": "2026-01-03:620.40",
+  "earliest_date_for_full_payment": "2026-01-03",
+  "spending_changes_needed": "none",
+  "decision_explanation": "Pay EUR 620.40 today. This leaves at least EUR 800 available."
+}

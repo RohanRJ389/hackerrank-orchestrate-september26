@@ -12,15 +12,15 @@ Complete at version `1.0.0`. See [boundary-contract.md](boundary-contract.md).
 
 ## 2. Build the deterministic decision engine
 
-- [ ] Accept only a normalized financial state and enriched request.
-- [ ] Generate the 90-day baseline cash-flow forecast.
-- [ ] Calculate the maximum amount safe to pay on the request date.
-- [ ] Calculate the earliest safe date for one full payment.
-- [ ] Evaluate full, partial, installment, wait, and decline outcomes.
-- [ ] Evaluate permitted spending reductions and cancellations.
-- [ ] Rank safe plans using the required ordering.
-- [ ] Generate and validate all required output fields.
-- [ ] Test the engine against handcrafted fixtures and solved samples.
+- [x] Accept only a normalized financial state and enriched request.
+- [x] Generate the 90-day baseline cash-flow forecast.
+- [x] Calculate the maximum amount safe to pay on the request date.
+- [x] Calculate the earliest safe date for one full payment.
+- [x] Evaluate full, partial, installment, wait, and decline outcomes.
+- [x] Evaluate permitted spending reductions and cancellations.
+- [x] Rank safe plans using the required ordering.
+- [x] Generate and validate all required output fields.
+- [x] Test the engine against handcrafted fixtures and solved samples.
 
 ## 3. Build the normalizer incrementally
 

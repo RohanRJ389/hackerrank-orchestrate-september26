@@ -1,0 +1,10 @@
+{
+  "request_id": "request_02",
+  "amount_safe_to_pay": "29574389.2",
+  "affordability_status": "affordable_with_plan",
+  "recommended_payment_method": "installments",
+  "payment_plan": "2025-08-08:15952906.67|2025-09-07:15952906.67|2025-10-07:15952906.67",
+  "earliest_date_for_full_payment": "2025-08-15",
+  "spending_changes_needed": "none",
+  "decision_explanation": "Use 3 installments of IDR 15,952,906.67, starting 8 August 2025. This leaves at least IDR 29,158,400 available."
+}
